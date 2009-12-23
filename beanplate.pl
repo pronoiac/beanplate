@@ -1,66 +1,77 @@
 #!/usr/bin/perl
 
-# $infile = "unpack/commentdata_askme.txt";
-# $infile = "unpack/commentlength_askme.txt";
-$infile = "unpack/favoritesdata.txt";
-# $filter = "\$datestamp =~ /2009-10/";
-$filter = "\$faver eq \$favee";
-# $filter = "1";
-
+# various defaults
+# $infile = "favoritesdata.txt";
+# $criteria = "datestamp =~ /2009-10/";
+# $criteria = "faver eq favee";
+$criteria = "1";
+$format = "\$line";  # by default, output the line as read
 $printheader = 1;
+# $debug = 1;
+# $verbose = 1;
 
+
+# parse command line arguments
+use Getopt::Std;
+%options=();
+getopts ("c:df:i:v", \%options);
+if (defined $options{c}) { $criteria = $options{c} };
+if (defined $options{d}) { $debug    = 1};
+if (defined $options{i}) { 
+  $infile   = $options{i} 
+} else {
+  # print help, require filename for input...
+  die "Need an input file!  And, um, no help is written yet.\n";
+}
+if (defined $options{f}) { $format   = $options{f}; $printheader = 0};
+if (defined $options{v}) { $verbose  = 1};
+
+
+# parse header - get datestamp
 $/ = "\r\n"; # input line terminators - 0d 0a
 open infile, $infile;
 $line = <infile>;
 chomp $line;
 if ($line =~ /(.+)/) {
   $filedatestamp = $1;
+  if ($verbose) {print "reading file $infile made on: $filedatestamp\n"}
 }
 
+
+# parse header - column headers
 $line = <infile>;
 chomp $line;
+$line =~ s/\?//;   # "best answer?" -> "best answer"
+$line =~ tr/\ /_/; # "best answer"  -> "best_answer"
 $header = $line;
 @fields = split (/\t/, $line);
 
-print scalar(@fields). "\n";
 
-# print @fields;
-# $format = "\$" .join ("\" \".\t\" . \$", @fields);
-$format = "\$" . join ("\ . \"\\t\" . \$", @fields);
+# rewrite filter criteria & format for speed in eval loop
+if ($verbose) {print "criteria: $criteria\n  format: $format\n"}
 
-print "format - $format\n";
-
-foreach $item ($filter, $format) {
-  print "pre:  $item.\n";
-  foreach $num (1 .. scalar(@fields) ) {
-    $src = $fields [$num - 1];
-    # $dest = "\$$num";
-    $dest = $num - 1;
-    # print $fields[$num] . " - $num\n";
-    #print "midway: $src - $dest - $format.\n";
-    # $item =~ s/\$$src/\$$num/;
-    $item =~ s/\$$src/\$read_fields \[$dest\]/;
+foreach $item ($criteria, $format) {
+  foreach $num (0 .. scalar(@fields) - 1 ) {
+    $item =~ s/$fields[$num]/\$read_fields\[$num\]/g;
   }
-  print "post: $item.\n";
 }
 
-#print "proc: $format\n";
 
-$to_eval = "
+# assemble eval loop
+$code = "
 while (\$line = <infile>) {
   chomp \$line; 
   # print \$line . \"\\n\";
   \@read_fields = split (/\\t/, \$line);
-  if ($filter) {
-    print $format . \"\\n\"; \
+  if ($criteria) {
+    print \"$format\\n\"; \
   }
 }
 ";
 
-print "eval: $to_eval";
+if ($verbose) { print "code:\t$code\n"; }
 
-if ($printheader) {
-  print "$header\n";
-}
+if ($printheader) { print "$header\n"; }
 
-eval ($to_eval) || print $@ . "\n";
+# magic happens here.  error catching is ... cryptic.
+eval ($code) || die "Error in code: $@\n";
