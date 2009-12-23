@@ -67,6 +67,7 @@ while (\$line = <infile>) {
     print \"$format\\n\"; \
   }
 }
+return 1;
 ";
 
 if ($verbose) { print "code:\t$code\n"; }
