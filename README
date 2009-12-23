@@ -1,0 +1,15 @@
+beanplate - a tool for filtering the Metafilter Infodump.
+
+The intent is to allow one to filter a file by criteria.  
+Show posts from October 2009: 
+  ./beanplate.pl -c "datestamp =~ /2009-10/" -i postdata_mefi.txt
+
+List users with 3-character usernames: 
+  ./beanplate.pl -i usernames.txt -c "name =~ /^...$/" 
+
+Show comments with the same id # as their post:
+  cat commentdata_* | ./beanplate.pl -i - -c "commentid eq postid" 
+  (this only shows a couple of first comments to first posts in subsites)
+
+Show Metafilter posts without titles (note, there are 21,000):
+  ./beanplate.pl -i posttitles_mefi.txt -c "title =~ /^$/" 
