@@ -70,7 +70,7 @@ while (\$line = <infile>) {
 return 1;
 ";
 
-if ($verbose) { print "code:\t$code\n"; }
+if ($debug) { print "code:\t$code\n"; }
 
 if ($printheader) { print "$header\n"; }
 
