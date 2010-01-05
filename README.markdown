@@ -3,12 +3,7 @@ beanplate - a tool for filtering the Metafilter Infodump.
 Infodump
 --------
 
-The Metafilter Infodump is "a collection of data culled from the Metafilter database, for explorin' and crunchin' and statistifyin'."  It's available for download,][1] with [wiki documentation][2] & it's catalyzed [much analysis & pretty graphs.][3]
-
-  [1]: http://stuff.metafilter.com/infodump/
-  [2]: http://mssv.net/wiki/index.php/Infodump
-  [3]: http://mssv.net/wiki/index.php/MetaAnalysis "spawning much analysis"
-
+The Metafilter Infodump is "a collection of data culled from the Metafilter database, for explorin' and crunchin' and statistifyin'."  It's [available for download,][1] with [wiki documentation][2] & it's catalyzed [much analysis & pretty graphs.][3]
 
 Usage
 -----
@@ -51,5 +46,9 @@ Show Metafilter posts without titles (note, there are 21,000):
 
 (This page was written using the [WMD Editor.][4])
 
+
+  [1]: http://stuff.metafilter.com/infodump/
+  [2]: http://mssv.net/wiki/index.php/Infodump
+  [3]: http://mssv.net/wiki/index.php/MetaAnalysis "spawning much analysis"
   [4]: http://wmd-editor.com/
 

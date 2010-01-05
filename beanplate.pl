@@ -19,9 +19,10 @@ $match_count = 0;
 # parse command line arguments
 use Getopt::Std;
 %options=();
-getopts ("c:df:i:v", \%options);
+getopts ("c:df:hi:v", \%options);
 if (defined $options{c}) { $criteria = $options{c} };
 if (defined $options{d}) { $debug    = 1};
+if (defined $options{h}) {&help};
 if (defined $options{i}) { 
   push (@infiles, $options{i});
 } 
@@ -29,8 +30,7 @@ if (defined $options{f}) { $format   = $options{f}; $printheader = 0};
 if (defined $options{v}) { $verbose  = 1};
 
 # leftover arguments?
-# while ($#ARGV != 0) {
-while (defined $ARGV[0]) {
+while ($ARGV[0]) {
   if (-e $ARGV[0]) {
     push (@infiles, $ARGV[0]);
     # print "infile: $ARGV[0]\n";
@@ -45,7 +45,8 @@ while (defined $ARGV[0]) {
 
 # if ($#infiles == 0) {
 if (!defined $infiles[0]) {
-  die "Need an input file!  And, um, no help is written yet...\n";
+  print "Need an input file!\n";
+  &help;
 }
 
 
@@ -109,4 +110,32 @@ EOF
 } # end loop over @infiles
 
 if ($verbose) { print "lines read: $line_count\nmatches: $match_count\n"; }
+
+sub help {
+  die <<'EOF';
+beanplate - filter Metafilter Infodump files
+  
+Usage: beanplate.pl [OPTION]... [CONDITION] [FILE]...
+
+The condition & input files can be listed or specified as options.
+
+  -c "CONDITION"  condition for a match
+  -i "FILE"       input file
+  -f "FORMAT"     what to print in case of a match
+  
+Huh?
+  -h              help!  (you're reading it.)
+  -v              verbose
+  -d              debug
+
+
+Examples: 
+  Show posts from October 2009: 
+    ./beanplate.pl "datestamp =~ /2009-10/" postdata_mefi.txt
+
+  List users with 3-character usernames: 
+    ./beanplate.pl "name =~ /^...$/" usernames.txt 
+
+EOF
+}  
 
