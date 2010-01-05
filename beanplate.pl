@@ -11,6 +11,10 @@ $printheader = 1;
 # $verbose = 1;
 @infiles = ();
 
+# within code.
+$line_count = 0;
+$match_count = 0;
+
 
 # parse command line arguments
 use Getopt::Std;
@@ -29,7 +33,7 @@ if (defined $options{v}) { $verbose  = 1};
 while (defined $ARGV[0]) {
   if (-e $ARGV[0]) {
     push (@infiles, $ARGV[0]);
-    print "infile: $ARGV[0]\n";
+    # print "infile: $ARGV[0]\n";
   } else {
     if (defined $options{c}) { 
       die "Multiple conditions specified: $options{c} and $ARGV[0].\n";
@@ -80,23 +84,29 @@ foreach (@infiles) {
 
 
   # assemble eval loop
-  $code = "
+  $code = <<EOF;
   while (\$line = <infile>) {
     chomp \$line; 
+    \$line_count++;
     # print \$line . \"\\n\";
     \@read_fields = split (/\\t/, \$line);
     if ($criteria) {
+      \$match_count ++;
       print \"$format\\n\"; \
     }
   }
   return 1;
-  ";
+EOF
 
   if ($debug) { print "code:\t$code\n"; }
 
   if ($printheader) { print "$header\n"; }
-
+  
   # magic happens here.  error catching is ... cryptic.
   eval ($code) || die "Error in code: $@\n";
+
   close infile;
 } # end loop over @infiles
+
+if ($verbose) { print "lines read: $line_count\nmatches: $match_count\n"; }
+
