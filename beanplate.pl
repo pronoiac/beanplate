@@ -55,7 +55,7 @@ foreach (@infiles) {
   $infile = $_;
 
   # parse header - get datestamp
-  $/ = "\r\n"; # input line terminators - 0d 0a
+  #$/ = "\r\n"; # input line terminators - 0d 0a
   open infile, $infile;
   $line = <infile>;
   chomp $line;
